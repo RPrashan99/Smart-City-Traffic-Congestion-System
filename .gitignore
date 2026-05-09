@@ -1,0 +1,12 @@
+airflow/logs/*
+airflow/plugins/*
+airflow/airflow.cfg
+airflow/airflow.db
+airflow/webserver_config.py
+airflow/airflow-webserver.pid
+
+__pycache__/
+
+project_reports/data/*
+project_reports/figures/*
+project_reports/reports/*
