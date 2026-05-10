@@ -118,6 +118,15 @@ class TrafficStreamingApp:
             .trigger(processingTime=trigger_interval) \
             .start()
     
+    def write_to_local(self, df, path, checkpoint_path, trigger_interval):
+        df.writeStream \
+            .format("parquet") \
+            .outputMode("append") \
+            .option("path", path) \
+            .option("checkpointLocation", checkpoint_path) \
+            .trigger(processingTime='1 minute') \
+            .start()
+
     def run_streaming_pipeline(self):
         parsed_df = self.read_from_kafka()
         agg_df = self.calculate_congestion_index(parsed_df)
@@ -131,6 +140,13 @@ class TrafficStreamingApp:
         )
         print("Aggregation HDFS stream started")
 
+        self.write_to_local(
+            agg_df, 
+            "/opt/shared/traffic_agg_5min", 
+            "/opt/shared/checkpoints/traffic_agg_5min", 
+            '1 minute'
+        )
+
         alerts_df = self.detect_congestion_alerts(parsed_df)
         self.write_to_hdfs(
             alerts_df,
@@ -139,6 +155,13 @@ class TrafficStreamingApp:
             '10 seconds'
         )
         print("Alert HDFS stream started")
+
+        self.write_to_local(
+            alerts_df,
+            "/opt/shared/traffic_alerts",
+            "/opt/shared/checkpoints/traffic_alerts",
+            '10 seconds'
+        )
 
         self.write_to_kafka(alerts_df)
         print("Alert Kafka stream started")

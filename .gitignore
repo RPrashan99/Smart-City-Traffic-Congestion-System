@@ -10,3 +10,4 @@ __pycache__/
 project_reports/data/*
 project_reports/figures/*
 project_reports/reports/*
+project_reports/shared/*
