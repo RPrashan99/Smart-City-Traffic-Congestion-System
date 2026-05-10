@@ -57,6 +57,7 @@ services:
       - "8081:8080"
     volumes:
       - ./spark_app:/opt/spark-apps
+      - ./project_reports/shared:/opt/shared
     depends_on:
       - namenode
 
@@ -70,6 +71,7 @@ services:
       - SPARK_WORKER_MEMORY=2g
     volumes:
       - ./spark_app:/opt/spark-apps
+      - ./project_reports/shared:/opt/shared
     depends_on:
       - spark-master
 
