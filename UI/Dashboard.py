@@ -290,13 +290,13 @@ if selected == "Dashboard":
     
     # Auto-refresh data every 10 seconds
     if st.button("🔄 Refresh Data", key="refresh_btn"):
-        st.session_state.traffic_data = generate_sample_data()
+        st.session_state.traffic_data = fetch_traffic_data()
         st.session_state.last_update = datetime.now()
         st.rerun()
     
     # Load current traffic data
     if not st.session_state.traffic_data:
-        st.session_state.traffic_data = generate_sample_data()
+        st.session_state.traffic_data = fetch_traffic_data()
     
     current_data = pd.DataFrame(st.session_state.traffic_data)
     
@@ -304,11 +304,11 @@ if selected == "Dashboard":
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        total_vehicles = current_data['vehicle_count'].sum()
+        total_vehicles = current_data['total_vehicles'].sum()
         st.metric("🚗 Total Vehicles (Last Hour)", f"{total_vehicles:,}", delta="+12%")
     
     with col2:
-        avg_speed = current_data['avg_speed'].mean()
+        avg_speed = current_data['avg_speed_window'].mean()
         st.metric("⚡ Average Speed", f"{avg_speed:.1f} km/h", delta="-5%", delta_color="inverse")
     
     with col3:
@@ -361,13 +361,13 @@ if selected == "Dashboard":
         fig = make_subplots(rows=2, cols=1, subplot_titles=("Vehicle Count by Junction", "Average Speed by Junction"))
         
         fig.add_trace(
-            go.Bar(x=current_data['sensor_id'], y=current_data['vehicle_count'], 
+            go.Bar(x=current_data['sensor_id'], y=current_data['total_vehicles'], 
                    name="Vehicles", marker_color='#ff5722'),
             row=1, col=1
         )
         
         fig.add_trace(
-            go.Bar(x=current_data['sensor_id'], y=current_data['avg_speed'], 
+            go.Bar(x=current_data['sensor_id'], y=current_data['avg_speed_window'], 
                    name="Speed (km/h)", marker_color='#2196f3'),
             row=2, col=1
         )
@@ -668,10 +668,10 @@ elif selected == "System Health":
     with col1:
         st.subheader("Pipeline Status")
         st.markdown("""
-        - ✅ **Kafka Producer**: Running
-        - ✅ **Spark Streaming**: Active
-        - ✅ **HDFS Storage**: Available
-        - ✅ **Airflow DAG**: Scheduled
+        - **Kafka Producer**: Running
+        - **Spark Streaming**: Active
+        - **HDFS Storage**: Available
+        - **Airflow DAG**: Scheduled
         """)
         
         st.subheader("Recent DAG Executions")
